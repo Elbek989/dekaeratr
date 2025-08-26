@@ -19,5 +19,11 @@ from django.urls import path
 from configapp.views import *
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/',HELLO.as_view())
+    path('actor/',ActorApi.as_view()),
+    path('actor/<int:pk>/',ActorDetailApi.as_view()),
+    path('movie/', MovieApi.as_view()),
+    path("movie/<int:pk>/", MovieDetailApi.as_view()),
+    path('movies/<int:start_year>/', MovieDataAPI.as_view()),
+    path('movies/<int:start_year>/<int:end_year>/', MovieDataAPI.as_view()),
+    path('movies/', MovieDataAPI.as_view()),
 ]
