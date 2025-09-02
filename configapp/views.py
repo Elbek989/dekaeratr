@@ -4,10 +4,10 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
-
+from drf_yasg.utils import swagger_auto_schema
 from .models import *
 from .serializers import *
-#
+
 # @api_view(["GET","POST"])
 # def actor_get_post(request):
 #     if request.method=="GET":
@@ -29,6 +29,10 @@ from .serializers import *
 #         return Response(data=serializer.data,status=status.HTTP_201_CREATED)
 
 class ActorApi(APIView):
+    @swagger_auto_schema(request_body=ActorSerializers)
+
+
+
     def post(self,request):
         serializer=ActorSerializers(data=request.data)
         if serializer.is_valid(raise_exception=True):
@@ -50,7 +54,7 @@ class ActorDetailApi(APIView):
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(data=serializer.data,status=status.HTTP_201_CREATED)
-
+#
 class MovieApi(APIView):
     def post(self, request):
         serializer = MovieSerializers(data=request.data)
@@ -88,4 +92,33 @@ class MovieDataAPI(APIView):
             movies = Movie.objects.annotate(count_actor = Count('actor')).filter(count_actor__lt = 3).prefetch_related('actor')
         serializer = MovieSerializers(movies, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class CommitApi(APIView):
+    @swagger_auto_schema(request_body=CommitSerializers)
+    def post(self, request):
+        serializer = CommitSerializers(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(data=serializer.data, status=status.HTTP_201_CREATED)
+
+    def get(self, request):
+        actors = CommitMovie.objects.all()
+        serializer = CommitSerializers(actors, many=True)
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
+
+class CommitDetailApi(APIView):
+    def get(self, request, pk):
+        commit = get_object_or_404(CommitMovie, pk=pk)
+        serializer = CommitSerializers(commit)
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
+
+    def put(self, request, pk):
+        commit = get_object_or_404(CommitMovie, pk=pk)
+        serializer = CommitSerializers(commit, data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(data=serializer.data, status=status.HTTP_201_CREATED)
+
+
 # Create your views here.
